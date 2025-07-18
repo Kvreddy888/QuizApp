@@ -1,0 +1,184 @@
+body {
+  background-color: #121212; /* Dark background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #ffffff; /* White text for general body */
+}
+
+.App {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.6rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #2979ff, #8e24aa, #ff8a65);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-flow 3s linear infinite;
+  margin-bottom: 40px;
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+input[type="text"] {
+  padding: 10px;
+  width: 60%;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #222;
+  color: #fff;
+  margin-right: 10px;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+/* General Button Styling (Filter, Show Answer, etc.) */
+button {
+  padding: 10px 16px;
+  border: 1px solid #ccc; /* Added a light border for definition */
+  border-radius: 6px;
+  background-color: #ffffff; /* White background */
+  color: #000000; /* Black font */
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s background, 0.15s transform, 0.3s border-color;
+  margin-bottom: 10px;
+}
+
+button:hover:not(:disabled) {
+  background-color: #e0e0e0; /* Slightly darker white/light grey on hover */
+  border-color: #999; /* Darker border on hover */
+  transform: translateY(-2px) scale(1.03);
+}
+
+button:disabled {
+  background: #444;
+  color: #888;
+  cursor: not-allowed;
+  border-color: #666; /* Keep border for disabled state */
+}
+
+.question-card {
+  background-color: #1e1e1e;
+  padding: 24px 16px;
+  border-radius: 14px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(41,121,255,0.08), 0 0 0 2px #202d3a;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.question-card:hover {
+  box-shadow: 0 6px 28px 4px rgba(41,121,255,0.16), 0 0 0 2px #2979ff;
+  transform: scale(1.012);
+}
+
+.question-card h3 {
+  color: #ffffff;
+  margin-bottom: 15px;
+  font-size: 1.15rem;
+}
+
+/* Option Button Styling */
+.option-button {
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1.5px solid #333; /* Darker border for contrast */
+  border-radius: 8px;
+  background-color: #ffffff; /* White background */
+  color: #000000; /* Black font */
+  text-align: left;
+  font-size: 1rem;
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.12s, transform 0.08s;
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+}
+
+.option-button:hover:not(.correct):not(.incorrect):not(:disabled) {
+  background-color: #e0e0e0; /* Light grey on hover */
+  border-color: #666; /* Darker border on hover */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+}
+
+.option-button:active {
+  transform: scale(0.97);
+}
+
+/* Correct and Incorrect Answer Styles (remain as is for clear feedback) */
+.option-button.correct {
+  background-color: #2e7d32 !important; /* Dark green */
+  border-color: #66bb6a !important; /* Lighter green border */
+  color: #fff !important; /* White font */
+  font-weight: 600;
+}
+
+.option-button.incorrect {
+  background-color: #c62828 !important; /* Dark red */
+  border-color: #ef5350 !important; /* Lighter red border */
+  color: #fff !important; /* White font */
+  font-weight: 600;
+}
+
+/* Result text (Correct/Incorrect message) */
+.result-text {
+  margin-top: 12px;
+  font-weight: bold;
+  padding: 8px 0;
+  border-radius: 5px;
+  font-size: 1.08em;
+}
+
+.result-text.correct {
+  color: #66bb6a; /* Green */
+}
+
+.result-text.incorrect {
+  color: #ef5350; /* Red */
+}
+
+.loader {
+  border: 6px solid #222;
+  border-top: 6px solid #2979ff;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+  margin: 26px auto 8px auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  .App {
+    padding: 8px;
+    max-width: 100vw;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .question-card {
+    padding: 18px 8px;
+  }
+}
