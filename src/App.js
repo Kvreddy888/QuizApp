@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import './App.css'; // Make sure this import is present
 
 function App() {
   const [questions, setQuestions] = useState([]);
@@ -14,7 +14,7 @@ function App() {
   const fetchAllQuestions = async () => {
     try {
       const response = await fetch('http://localhost:8080/question/allQuestions');
-      const data = await response.json();
+      const data = await await response.json();
       setQuestions(data);
     } catch (error) {
       console.error('Error fetching all questions:', error);
@@ -33,16 +33,33 @@ function App() {
     }
   };
 
-  const handleOptionClick = (questionId, selectedKey, correctKey) => {
+  const handleOptionClick = async (questionId, selectedKey) => {
     if (selectedAnswers[questionId]) return;
 
-    setSelectedAnswers((prev) => ({
-      ...prev,
-      [questionId]: {
-        selectedKey,
-        isCorrect: selectedKey === correctKey,
-      },
-    }));
+    try {
+      const response = await fetch('http://localhost:8080/question/checkAnswer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionId: questionId,
+          selectedOption: selectedKey,
+        }),
+      });
+
+      const data = await response.json(); // AnswerResponse DTO: { isCorrect: boolean, correct_option: string }
+      setSelectedAnswers((prev) => ({
+        ...prev,
+        [questionId]: {
+          selectedKey,
+          isCorrect: data.isCorrect, // This is the boolean from backend
+          correctOption: data.correct_option, // This will be "option_a", "option_b", etc.
+        },
+      }));
+    } catch (error) {
+      console.error('Error checking answer:', error);
+    }
   };
 
   const handleShowAnswerToggle = (questionId) => {
@@ -53,7 +70,7 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ padding: '20px' }}>
+    <div className="App">
       <h1>All Questions</h1>
 
       <div style={{ marginBottom: '20px' }}>
@@ -73,41 +90,50 @@ function App() {
           const answer = selectedAnswers[q.id];
           const isAnswerShown = showAnswers[q.id];
 
+          const options = ['a', 'b', 'c', 'd'].map((key) => {
+            const optionKey = `option_${key}`;
+            const value = q[optionKey];
+
+            return value
+              ? { key: optionKey, label: key.toUpperCase(), value }
+              : null;
+          }).filter(Boolean);
+
           return (
             <div
               key={q.id}
-              style={{
-                marginBottom: '25px',
-                border: '1px solid #ccc',
-                padding: '15px',
-                borderRadius: '8px',
-              }}
+              className="question-card"
             >
-              <h3>{q.questionText}</h3>
+              <h3>{q.question_text}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {['a', 'b', 'c', 'd'].map((optKey) => {
-                  const value = q[`option_${optKey}`];
-                  const isSelected = answer?.selectedKey === optKey;
+                {options.map((opt) => {
+                  const isSelected = answer?.selectedKey === opt.key;
+                  const isCorrectOption = answer?.correctOption === opt.key;
+
+                  let buttonClass = 'option-button';
+
+                  if (answer) { // If an answer has been selected for this question
+                    if (isCorrectOption) { // Always highlight the actual correct option green
+                      buttonClass += ' correct';
+                    } else if (isSelected && !answer.isCorrect) {
+                      // Highlight the selected option red ONLY if it's incorrect
+                      buttonClass += ' incorrect';
+                    }
+                    // If isSelected and answer.isCorrect is true, it falls under the isCorrectOption above
+                    // If not selected and not correct option, it remains default (grey/white via CSS)
+                  } else {
+                    // No answer selected yet, apply default blue
+                    buttonClass += ' default-blue-bg';
+                  }
 
                   return (
                     <button
-                      key={optKey}
-                      onClick={() => handleOptionClick(q.id, optKey, q.correct_option)}
+                      key={opt.key}
+                      onClick={() => handleOptionClick(q.id, opt.key)}
                       disabled={!!answer}
-                      style={{
-                        backgroundColor: isSelected
-                          ? answer?.isCorrect
-                            ? '#c8f7c5'
-                            : '#f7c5c5'
-                          : '#f0f0f0',
-                        cursor: answer ? 'not-allowed' : 'pointer',
-                        padding: '10px',
-                        borderRadius: '6px',
-                        border: isSelected ? '2px solid black' : '1px solid #ccc',
-                        textAlign: 'left',
-                      }}
+                      className={buttonClass}
                     >
-                      {value}
+                      {opt.label}. {opt.value}
                     </button>
                   );
                 })}
@@ -121,15 +147,11 @@ function App() {
 
                   {isAnswerShown && (
                     <p
-                      style={{
-                        fontWeight: 'bold',
-                        color: answer.isCorrect ? 'green' : 'red',
-                        marginTop: '10px',
-                      }}
+                      className={`answer-message ${answer.isCorrect ? 'correct-msg' : 'incorrect-msg'}`}
                     >
                       {answer.isCorrect
                         ? '✅ Correct!'
-                        : `❌ Incorrect! Correct Answer: ${q[`option_${q.correct_option}`]} (${q.correct_option.toUpperCase()})`}
+                        : `❌ Incorrect! Correct Answer: ${options.find(o => o.key === answer.correctOption)?.label}. ${options.find(o => o.key === answer.correctOption)?.value}`}
                     </p>
                   )}
                 </div>
